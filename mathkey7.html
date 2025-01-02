@@ -125,9 +125,13 @@
       // registerNodeKey('and', () => new mke.StandardLeafNode(String.raw`\land`));
       // registerNodeKey('doubleRightArrow', () => new mke.StandardLeafNode(String.raw`\Rightarrow`));
       // registerNodeKey('doubleLeftArrow', () => new mke.StandardLeafNode(String.raw`\Leftarrow`));
+      registerNodeKey('tan', () => new mke.StandardLeafNode(String.raw`\tan{}`));
+      registerNodeKey('arcsin', () => new mke.StandardLeafNode(String.raw`\arcsin{}`));
+      registerNodeKey('sin', () => new mke.StandardLeafNode(String.raw`\sin{}`));
+      registerNodeKey('cos', () => new mke.StandardLeafNode(String.raw`\cos^{}`));
       registerNodeKey('cos-1', () => new mke.StandardLeafNode(String.raw`\cos^{-1}`));
       registerNodeKey('taninv', () => new mke.StandardLeafNode(String.raw`\tan^{inv}`));
-      const getIntegralNode = () => new mke.AscendingBranchingNode(String.raw`\int_{`, '}^{', '}');
+      // const getIntegralNode = () => new mke.AscendingBranchingNode(String.raw`\int_{`, '}^{', '}');
       // registerNodeKey('integral', getIntegralNode);
       // const getSumNode = () => new mke.AscendingBranchingNode(String.raw`\sum_{`, '}^{', '}');
       // registerNodeKey('sum', getSumNode);
