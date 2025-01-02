@@ -1,0 +1,635 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>MathKeyboardEngine + MathJax [unstyled example]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- MathJax specific code START -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <!-- MathJax specific code END -->
+    <script type="module">
+      import * as mke from 'https://cdn.jsdelivr.net/npm/mathkeyboardengine@v1.1.0/dist/MathKeyboardEngine.es2017-esm.min.js';
+      let latexConfiguration = new mke.LatexConfiguration();
+      let keyboardMemory = new mke.KeyboardMemory();
+      const supportsSelectionMode = 'supportsSelectionMode';
+      const darkSelectionModeColor = '#1668c7';
+      const lightSelectionModeColor = '#add8e6';
+
+      const colorScheme = document.getElementById('colorScheme');
+      const bodyClassList = document.body.classList;
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        bodyClassList.remove('dark');
+        colorScheme.innerText = 'light';
+        setSelectionModeColor(lightSelectionModeColor);
+      } else {
+        colorScheme.innerText = 'dark';
+        setSelectionModeColor(darkSelectionModeColor);
+      }
+
+      document.getElementById('colorSchemeToggle').onclick = () => {
+        if (colorScheme.innerText == 'light') {
+          bodyClassList.add('dark');
+          colorScheme.innerText = 'dark';
+          setSelectionModeColor(darkSelectionModeColor);
+        } else {
+          bodyClassList.remove('dark');
+          colorScheme.innerText = 'light';
+          setSelectionModeColor(lightSelectionModeColor);
+        }
+        displayResult();
+      };
+
+      function setSelectionModeColor(color) {
+        document.body.style.setProperty('--selection-mode-color', color);
+        setSelectionHightlightStart(color);
+      }
+
+      displayResult();
+
+      for (let i = 0; i < 10; i++) {
+        registerNodeKey('digit' + i, () => new mke.DigitNode(i.toString()));
+      }
+
+      for (let letter of ['a', 'b', 'c', 'x', 'y', 'z']) {
+        registerNodeKey(letter, () => new mke.StandardLeafNode(letter));
+      }
+
+      for (let s of ['alpha', 'beta', 'gamma', 'lambda', 'mu', 'pi', 'div', 'sin', 'tan', 'cos', 'arcsin', 'infty', 'leftarrow', 'rightarrow', 'uparrow', 'downarrow', 'approx']) {
+        registerNodeKey(s, () => new mke.StandardLeafNode('\\' + s));
+      }
+
+      const decimalSeparatorTypeElement = document.getElementById('decimalSeparatorType');
+      document.getElementById('decimalSeparatorToggle').onclick = () => {
+        const key = document.getElementById('decimalSeparator');
+        if (decimalSeparatorTypeElement.innerText == 'decimal comma') {
+          decimalSeparatorTypeElement.innerText = 'decimal point';
+          typesetLatexInKey('.', key);
+        } else {
+          decimalSeparatorTypeElement.innerText = 'decimal comma';
+          typesetLatexInKey('{,}', key);
+        }
+        displayResult();
+      };
+      const getDecimalSeparatorPreference = () => (decimalSeparatorTypeElement.innerText == 'decimal comma' ? '{,}' : '.');
+      const getDecimalSeparatorNode = () => new mke.DecimalSeparatorNode(getDecimalSeparatorPreference);
+      registerNodeKey('decimalSeparator', getDecimalSeparatorNode);
+      registerNodeKey('equal', () => new mke.StandardLeafNode('='));
+      registerNodeKey('notEqual', () => new mke.StandardLeafNode(String.raw`\neq`));
+      registerNodeKey('lessThan', () => new mke.StandardLeafNode('<'));
+      registerNodeKey('greaterThan', () => new mke.StandardLeafNode('>'));
+      registerNodeKey('lessThanOrEqual', () => new mke.StandardLeafNode(String.raw`\leq`));
+      registerNodeKey('greaterThanOrEqual', () => new mke.StandardLeafNode(String.raw`\geq`));
+      registerNodeKey('plusminus', () => new mke.StandardLeafNode(String.raw`\pm`));
+      registerNodeKey('plus', () => new mke.StandardLeafNode('+'));
+      registerNodeKey('minus', () => new mke.StandardLeafNode('-'));
+
+      const multiplicationSignTypeElement = document.getElementById('multiplicationSignType');
+      document.getElementById('multiplicationSignToggle').onclick = () => {
+        multiplicationSignTypeElement.innerText = multiplicationSignTypeElement.innerText == 'cross' ? 'dot' : 'cross';
+        displayResult();
+      };
+      const getMultiplicationNode = () => new mke.StandardLeafNode(() => (multiplicationSignTypeElement.innerText == 'cross' ? String.raw`\times` : String.raw`\cdot`));
+      registerNodeKey('multiply', getMultiplicationNode);
+      registerNodeKey('ratio', () => new mke.StandardLeafNode(':'));
+      registerNodeKey('faculty', () => new mke.StandardLeafNode('!'));
+      const getFractionNode = () => new mke.DescendingBranchingNode(String.raw`\frac{`, '}{', '}');
+      registerNodeKey('fraction', getFractionNode, mke.insert, mke.insertWithEncapsulateSelection);
+      const getBinomialNode = () => new mke.DescendingBranchingNode(String.raw`\binom{`, '}{', '}');
+      registerNodeKey('binomial', getBinomialNode, mke.insert, mke.insertWithEncapsulateSelection);
+      const getPowerNode = () => new mke.AscendingBranchingNode('', '^{', '}');
+      registerNodeKey('power', getPowerNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
+      const getSubscriptNode = () => new mke.DescendingBranchingNode('', '_{', '}');
+      registerNodeKey('subscript', getSubscriptNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
+      const getSquareRootNode = () => new mke.StandardBranchingNode(String.raw`\sqrt{`, '}');
+      registerNodeKey('squareRoot', getSquareRootNode, mke.insert, mke.insertWithEncapsulateSelection);
+      registerNodeKey('nthRoot', () => new mke.DescendingBranchingNode(String.raw`\sqrt[`, ']{', '}'));
+      registerNodeKey('roundBrackets', () => new mke.RoundBracketsNode(), mke.insert, mke.insertWithEncapsulateSelection);
+      const getSquareBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left[`, String.raw`\right]`);
+      registerNodeKey('squareBrackets', getSquareBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
+      const getPipesNode = () => new mke.StandardBranchingNode(String.raw`\left|`, String.raw`\right|`);
+      registerNodeKey('pipes', getPipesNode, mke.insert, mke.insertWithEncapsulateSelection);
+      registerNodeKey('doublePipes', () => new mke.StandardBranchingNode(String.raw`\left\|`, String.raw`\right\|`), mke.insert, mke.insertWithEncapsulateSelection);
+      const getCurlyBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left\{`, String.raw`\right\}`);
+      registerNodeKey('curlyBrackets', getCurlyBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
+      registerNodeKey('naturalNumbers', () => new mke.StandardLeafNode(String.raw`\mathbb{N}`));
+      registerNodeKey('integers', () => new mke.StandardLeafNode(String.raw`\mathbb{Z}`));
+      registerNodeKey('realNumbers', () => new mke.StandardLeafNode(String.raw`\mathbb{R}`));
+      registerNodeKey('isMemberOf', () => new mke.StandardLeafNode(String.raw`\in`));
+      registerNodeKey('isProperSubsetOf', () => new mke.StandardLeafNode(String.raw`\subset`));
+      registerNodeKey('isSubsetOf', () => new mke.StandardLeafNode(String.raw`\subseteq`));
+      registerNodeKey('setDifference', () => new mke.StandardLeafNode(String.raw`\setminus`));
+      registerNodeKey('exists', () => new mke.StandardLeafNode(String.raw`\exists`));
+      registerNodeKey('forAll', () => new mke.StandardLeafNode(String.raw`\forall`));
+      registerNodeKey('not', () => new mke.StandardLeafNode(String.raw`\neg`));
+      registerNodeKey('or', () => new mke.StandardLeafNode(String.raw`\lor`));
+      registerNodeKey('and', () => new mke.StandardLeafNode(String.raw`\land`));
+      registerNodeKey('doubleRightArrow', () => new mke.StandardLeafNode(String.raw`\Rightarrow`));
+      registerNodeKey('doubleLeftArrow', () => new mke.StandardLeafNode(String.raw`\Leftarrow`));
+      registerNodeKey('cos-1', () => new mke.StandardLeafNode(String.raw`\cos^{-1}`));
+      registerNodeKey('taninv', () => new mke.StandardLeafNode(String.raw`\tan^{inv}`));
+      const getIntegralNode = () => new mke.AscendingBranchingNode(String.raw`\int_{`, '}^{', '}');
+      registerNodeKey('integral', getIntegralNode);
+      const getSumNode = () => new mke.AscendingBranchingNode(String.raw`\sum_{`, '}^{', '}');
+      registerNodeKey('sum', getSumNode);
+      const getProductNode = () => new mke.AscendingBranchingNode(String.raw`\prod_{`, '}^{', '}');
+      registerNodeKey('product', getProductNode);
+      const getLimitNode = () => new mke.StandardBranchingNode(String.raw`\lim_{`, '}');
+      registerNodeKey('limit', getLimitNode);
+
+      const matrixWidthInputElement = document.getElementById('matrixWidth');
+      const matrixHeightInputElement = document.getElementById('matrixHeight');
+      function reRegisterMatrix() {
+        registerNodeKey('pmatrix', () => new mke.MatrixNode('pmatrix', matrixWidthInputElement.value, matrixHeightInputElement.value));
+        registerNodeKey('vmatrix', () => new mke.MatrixNode('vmatrix', matrixWidthInputElement.value, matrixHeightInputElement.value));
+      }
+      reRegisterMatrix();
+      matrixWidthInputElement.onchange = reRegisterMatrix;
+      matrixHeightInputElement.onchange = reRegisterMatrix;
+
+      registerKey('moveLeft', mke.moveLeft, mke.selectLeft, false);
+      typesetLatexInKey(String.raw`\leftarrow`, document.getElementById('moveLeft'));
+      registerKey('moveRight', mke.moveRight, mke.selectRight, false);
+      typesetLatexInKey(String.raw`\rightarrow`, document.getElementById('moveRight'));
+      registerKey('moveUp', mke.moveUp);
+      typesetLatexInKey('\\uparrow', document.getElementById('moveUp'));
+      registerKey('moveDown', mke.moveDown);
+      typesetLatexInKey(String.raw`\downarrow`, document.getElementById('moveDown'));
+      registerKey('deleteLeft', mke.deleteLeft, mke.deleteSelection);
+
+      registerKey('selectionModeToggle', (k) => {
+        if (mke.inSelectionMode(k)) {
+          myLeaveSelectionMode(k);
+        } else {
+          myEnterSelectionMode(k);
+        }
+      });
+
+      function myLeaveSelectionMode(k) {
+        mke.leaveSelectionMode(k);
+        let elements = document.getElementsByClassName(supportsSelectionMode);
+        for (let element of elements) {
+          element.classList.remove('inSelectionMode');
+        }
+      }
+      function myEnterSelectionMode(k) {
+        mke.enterSelectionMode(k);
+        let elements = document.getElementsByClassName(supportsSelectionMode);
+        for (let element of elements) {
+          element.classList.add('inSelectionMode');
+        }
+      }
+
+      function registerNodeKey(elementId, nodeGetter, onclickFuncForKeyboardMemoryAndNode = mke.insert, onclickSelectionModeArrowFuncForKeyboardMemoryAndNode = null) {
+        let element = document.getElementById(elementId);
+        if (onclickSelectionModeArrowFuncForKeyboardMemoryAndNode != null) {
+          element.classList.add(supportsSelectionMode);
+        }
+
+        let latex = mke.getViewModeLatex(nodeGetter(), latexConfiguration);
+        typesetLatexInKey(latex, element);
+        element.onclick = () => {
+          if (mke.inSelectionMode(keyboardMemory)) {
+            if (onclickSelectionModeArrowFuncForKeyboardMemoryAndNode != null) {
+              onclickSelectionModeArrowFuncForKeyboardMemoryAndNode(keyboardMemory, nodeGetter());
+            } else {
+              onclickFuncForKeyboardMemoryAndNode(keyboardMemory, nodeGetter());
+            }
+            myLeaveSelectionMode(keyboardMemory);
+          } else {
+            onclickFuncForKeyboardMemoryAndNode(keyboardMemory, nodeGetter());
+          }
+          displayResult();
+        };
+      }
+
+      function registerKey(elementId, onclickArrowFuncForKeyboardMemory, onclickSelectionModeFuncForKeyboardMemory = null, shouldLeaveSelectionMode = true) {
+        let element = document.getElementById(elementId);
+        if (onclickSelectionModeFuncForKeyboardMemory != null) {
+          element.classList.add(supportsSelectionMode);
+        }
+
+        element.onclick = () => {
+          if (mke.inSelectionMode(keyboardMemory)) {
+            if (onclickSelectionModeFuncForKeyboardMemory != null) {
+              onclickSelectionModeFuncForKeyboardMemory(keyboardMemory);
+            }
+            if (shouldLeaveSelectionMode) {
+              myLeaveSelectionMode(keyboardMemory);
+            }
+          } else {
+            onclickArrowFuncForKeyboardMemory(keyboardMemory);
+          }
+          displayResult();
+        };
+      }
+
+      function displayResult() {
+        if (keyboardMemory.current instanceof mke.Placeholder && keyboardMemory.current.nodes.length == 0) {
+          latexConfiguration.activePlaceholderShape = String.raw`\blacksquare`;
+        } else {
+          latexConfiguration.activePlaceholderShape = '|';
+        }
+        let editModeLatex = mke.getEditModeLatex(keyboardMemory, latexConfiguration);
+        typesetLatexInOutputBox(editModeLatex, document.getElementById('typesetEditModeLatex'));
+
+        let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
+        document.getElementById('viewModeLatex').innerText = viewModeLatex;
+      }
+
+      // === MathJax specific code START ===
+      function typesetLatexInKey(latex, element) {
+        element.innerText = String.raw`\(` + latex + String.raw`\)`;
+        MathJax.Hub.Typeset(element);
+      }
+
+      function typesetLatexInOutputBox(latex, element) {
+        element.innerText = String.raw`\(\displaystyle ` + latex + String.raw`\)`;
+        MathJax.Hub.Typeset(element);
+      }
+
+      function setSelectionHightlightStart(color) {
+        latexConfiguration.selectionHightlightStart = String.raw`\bbox[` + color + ']{';
+      }
+      latexConfiguration.selectionHightlightEnd = '}';
+      // === MathJax specific code END ===
+
+      // === Handle key presses of a physical keyboard START ===
+      let inShift = false;
+      document.onkeyup = (e) => {
+        const key = e.code;
+        if (key.startsWith('Shift')) {
+          inShift = false;
+        }
+      };
+
+      function createHandler(matchingPredicateForKey, handleForKeyboardMemoryAndKey) {
+        return { canHandle: matchingPredicateForKey, handle: handleForKeyboardMemoryAndKey };
+      }
+
+      const physicalKeydownHandlersForShift = [
+        createHandler((key) => key == 'Digit6', (k, key) => mke.insertWithEncapsulateCurrent(k, getPowerNode())),
+        createHandler((key) => key == 'Digit9', (k, key) => mke.insert(k, new mke.RoundBracketsNode())),
+        createHandler((key) => key == 'Digit0', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'Digit8', (k, key) => mke.insert(k, getMultiplicationNode())),
+        createHandler((key) => key == 'Equal', (k, key) => mke.insert(k, new mke.StandardLeafNode('+'))),
+        createHandler((key) => key == 'Minus', (k, key) => mke.insertWithEncapsulateCurrent(k, getSubscriptNode())),
+        createHandler((key) => key == 'Digit1', (k, key) => mke.insert(k, new mke.StandardLeafNode('!'))),
+        createHandler((key) => key == 'Digit5', (k, key) => mke.insert(k, new mke.StandardLeafNode(String.raw`\%`))),
+        createHandler((key) => key.startsWith('Key'), (k, key) => mke.insert(k, new mke.StandardLeafNode(key[3]))),
+        createHandler((key) => key == 'ArrowLeft', (k, key) => { myEnterSelectionMode(k); mke.selectLeft(k); }),
+        createHandler((key) => key == 'ArrowRight', (k, key) => { myEnterSelectionMode(k); mke.selectRight(k); }),
+        createHandler((key) => key == 'Backslash', (k, key) => mke.insert(k, getPipesNode())),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insert(k, getCurlyBracketsNode())),
+        createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'Comma', (k, key) => mke.insert(k, new mke.StandardLeafNode('<'))),
+        createHandler((key) => key == 'Period', (k, key) => mke.insert(k, new mke.StandardLeafNode('>'))),
+        createHandler((key) => key == 'Semicolon', (k, key) => mke.insert(k, new mke.StandardLeafNode(':'))),
+      ];
+
+      const selectionModePhysicalKeydownHandlersForShift = [
+        createHandler((key) => key == 'Digit6', (k, key) => mke.insertWithEncapsulateSelectionAndPrevious(k, getPowerNode())),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insertWithEncapsulateSelection(k, getCurlyBracketsNode())),
+        createHandler((key) => key == 'Backslash', (k, key) => mke.insertWithEncapsulateSelection(k, getPipesNode())),
+        createHandler((key) => key == 'Digit9', (k, key) => mke.insertWithEncapsulateSelection(k, new mke.RoundBracketsNode())),
+      ];
+
+      const selectionModePhysicalKeydownHandlersNoShift = [
+        createHandler((key) => key == 'Backspace', (k, key) => mke.deleteSelection(k)),
+        createHandler((key) => key == 'Delete', (k, key) => mke.deleteSelection(k)),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insertWithEncapsulateSelection(k, getSquareBracketsNode())),
+        createHandler((key) => key == 'Slash', (k, key) => mke.insertWithEncapsulateSelection(k, getFractionNode())),
+      ];
+
+      const physicalKeydownHandlersNoShift = [
+        createHandler((key) => key.startsWith('Digit'), (k, key) => mke.insert(k, new mke.DigitNode(key[5]))),
+        createHandler((key) => key.startsWith('Key'), (k, key) => mke.insert(k, new mke.StandardLeafNode(key[3].toLocaleLowerCase()))),
+        createHandler((key) => key == 'Backspace', (k, key) => mke.deleteLeft(k)),
+        createHandler((key) => key == 'ArrowLeft', (k, key) => mke.moveLeft(k)),
+        createHandler((key) => key == 'ArrowRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'ArrowUp', (k, key) => mke.moveUp(k)),
+        createHandler((key) => key == 'ArrowDown', (k, key) => mke.moveDown(k)),
+        createHandler((key) => key == 'Slash', (k, key) => mke.insertWithEncapsulateCurrent(k, getFractionNode(), { deleteOuterRoundBracketsIfAny: true })),
+        createHandler((key) => key == 'Equal', (k, key) => mke.insert(k, new mke.StandardLeafNode('='))),
+        createHandler((key) => key == 'Minus', (k, key) => mke.insert(k, new mke.StandardLeafNode('-'))),
+        createHandler((key) => key == 'Period' || key == 'Comma', (k, key) => mke.insert(k, getDecimalSeparatorNode())),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insert(k, getSquareBracketsNode())),
+        createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'Delete', (k, key) => mke.deleteRight(k)),
+      ];
+
+      document.onkeydown = (e) => {
+        if (document.activeElement.classList.contains('disable-physical-keypress-math-input-when-focused')) {
+          return;
+        }
+        const shouldPreventDefault = true;
+        const key = e.code;
+        if (key.startsWith('Shift')) {
+          inShift = true;
+        } else if (mke.inSelectionMode(keyboardMemory)) {
+          if (key == 'ArrowLeft') {
+            mke.selectLeft(keyboardMemory);
+          } else if (key == 'ArrowRight') {
+            mke.selectRight(keyboardMemory);
+          } else if (inShift) {
+            let handler = selectionModePhysicalKeydownHandlersForShift.find((handler) => handler.canHandle(key));
+            if (handler != null) {
+              handler.handle(keyboardMemory, key);
+              myLeaveSelectionMode(keyboardMemory);
+            } else {
+              myLeaveSelectionMode(keyboardMemory, key);
+              physicalKeydownHandlersForShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+            }
+          } else {
+            let handler = selectionModePhysicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key));
+            if (handler != null) {
+              handler.handle(keyboardMemory, key);
+              myLeaveSelectionMode(keyboardMemory);
+            } else {
+              myLeaveSelectionMode(keyboardMemory);
+              physicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+            }
+          }
+        } else {
+          if (!inShift && key == 'Backslash') {
+            inputToParse.focus();
+            shouldPreventDefault = false;
+          } else if (inShift) {
+            physicalKeydownHandlersForShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+          } else {
+            physicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+          }
+        }
+        displayResult();
+        if (shouldPreventDefault) {
+          e.preventDefault(/* Prevent triggering a browser hot key. */);
+        }
+      };
+      // === Handle key presses of a physical keyboard END ===
+
+      // === Experimental feature: parsing a LaTeX string START ===
+      var inputToParse = document.getElementById('inputToParse');
+      var inputMirror = document.getElementById('inputMirror');
+      inputToParse.oninput = 
+      inputToParse.onpaste =
+      () => {
+        const value = inputToParse.value;
+        inputMirror.innerText = value.length > 2 ? inputToParse.value + ' ----> press Enter' : value;
+      }
+    
+      var parserConfig = new mke.LatexParserConfiguration();
+      parserConfig.preferRoundBracketsNode = true;
+      parserConfig.preferredDecimalSeparator = getDecimalSeparatorPreference;
+      inputToParse.onkeydown = (e) => {
+        if (e.code == 'Enter') {
+          const nodes = mke.parseLatex(inputToParse.value, parserConfig).syntaxTreeRoot.nodes;
+          mke.insert(keyboardMemory, nodes);
+          displayResult();
+          inputToParse.value = '';
+          inputMirror.innerText = '';
+          document.activeElement.blur();
+          window.scrollTo(0, 0);
+        }
+      };
+      // === Experimental feature: parsing a LaTeX string END ===
+    </script>
+    <style>
+      :root {
+        --selection-mode-color: #1668c7;
+      }
+      .dark {
+        background-color: black;
+        color: white;
+      }
+
+      html {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        user-select: none; /* supported by Chrome and Opera */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      input {
+        font-size: 1rem;
+        width: 2.5rem;
+      }
+
+      #typesetEditModeLatex {
+        border: 1px solid gray;
+        padding: 0.25rem;
+        min-height: 2.5rem;
+      }
+      #viewModeLatex {
+        text-align: right;
+      }
+
+      #mathKeyboard > * {
+        display: inline-block;
+        border: 1px solid gray;
+        padding: 0.25rem;
+        margin: 1px;
+        min-width: 1.5rem;
+        min-height: 1.5rem;
+        vertical-align: middle;
+        text-align: center;
+        cursor: default;
+        user-select: none;
+        outline: 0;
+      }
+
+      .inSelectionMode {
+        background-color: var(--selection-mode-color);
+      }
+      #selectionModeToggle {
+        background-color: var(--selection-mode-color);
+      }
+
+      #settingsContainer {
+        display: none;
+        text-align: left;
+      }
+
+      .setting {
+        margin: 1rem;
+        cursor: default;
+      }
+      .setting-value {
+        border: 1px solid gray;
+        padding: 0.15rem;
+      }
+
+      .footer {
+        text-align: center;
+        color: #58a6ff;
+        margin: 15px;
+      }
+
+      .footer > a {
+        display: inline-block;
+        color: #58a6ff;
+        margin: 4px;
+        text-decoration: none;
+        border: 1px solid #58a6ff;
+        padding: 0.25rem;
+      }
+
+      #inputMirror {
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: green;
+      }
+
+      #inputToParse {
+        width: 300px;
+      }
+
+      kbd {
+        border: 2px solid gray;
+        font-size: 1rem;
+        padding: 2px;
+      }
+    </style>
+  </head>
+  <body class="dark">
+    <h1>MathKeyboardEngine + MathJax</h1>
+    <div id="inputMirror"></div>
+    <div id="typesetEditModeLatex"></div>
+    <div id="viewModeLatex"></div>
+    <i>Example keys - to be styled - to help you design your virtual math keyboard</i>
+    <div id="mathKeyboard">
+      <div id="selectionModeToggle"></div>
+      <div id="moveUp">&#x25B2;</div>
+      <div id="deleteLeft">&#128293;</div>
+      <br />
+      <div id="moveLeft">&#x25C0;</div>
+      <div id="moveDown">&#x25BC;</div>
+      <div id="moveRight">&#x25B6;</div>
+      <div onclick="const settingsContainer = document.getElementById('settingsContainer'); settingsContainer.style.display = settingsContainer.style.display == 'block' ? 'none' : 'block';">
+        <strong>Settings</strong>
+      </div>
+      <div id="settingsContainer">
+        <div id="multiplicationSignToggle" class="setting">Output multiplication sign: <span class="setting-value" id="multiplicationSignType">cross</span></div>
+        <div id="decimalSeparatorToggle" class="setting">Decimal separator: <span class="setting-value" id="decimalSeparatorType">decimal point</span></div>
+        <div id="colorSchemeToggle" class="setting">Color scheme: <span class="setting-value" id="colorScheme"></span></div>
+      </div>
+      <br />
+      <div id="digit0"></div>
+      <div id="digit1"></div>
+      <div id="digit2"></div>
+      <div id="digit3"></div>
+      <div id="digit4"></div>
+      <div id="digit5"></div>
+      <div id="digit6"></div>
+      <div id="digit7"></div>
+      <div id="digit8"></div>
+      <div id="digit9"></div>
+      <div id="decimalSeparator"></div>
+      <br />
+      <div id="a"></div>
+      <div id="b"></div>
+      <div id="c"></div>
+      <div id="x"></div>
+      <div id="y"></div>
+      <div id="z"></div>
+      <div id="alpha"></div>
+      <div id="beta"></div>
+      <div id="gamma"></div>
+      <div id="lambda"></div>
+      <div id="mu"></div>
+      <div id="pi"></div>
+      <br />
+      <div id="plusminus"></div>
+      <div id="plus"></div>
+      <div id="minus"></div>
+      <div id="multiply"></div>
+      <div id="ratio"></div>
+      <div id="div"></div>
+      <div id="faculty"></div>
+      <br />
+      <div id="binomial"></div>
+      <div id="fraction"></div>
+      <div id="power"></div>
+      <div id="subscript"></div>
+      <div id="squareRoot"></div>
+      <div id="nthRoot"></div>
+      <br />
+      <div id="roundBrackets"></div>
+      <div id="squareBrackets"></div>
+      <div id="curlyBrackets"></div>
+      <div id="pipes"></div>
+      <div id="doublePipes"></div>
+      <br />
+      <div style="text-align: right">
+        <label for="matrixHeight">Height</label>
+        <input id="matrixHeight" type="number" value="2" min="1" class="disable-physical-keypress-math-input-when-focused" />
+        <br />
+        <label for="matrixWidth">Width</label>
+        <input id="matrixWidth" type="number" value="2" min="1" class="disable-physical-keypress-math-input-when-focused" />
+      </div>
+      <div id="pmatrix"></div>
+      <div id="vmatrix"></div>
+      <br />
+      <div id="approx"></div>
+      <div id="equal"></div>
+      <div id="notEqual"></div>
+      <div id="lessThanOrEqual"></div>
+      <div id="greaterThanOrEqual"></div>
+      <div id="lessThan"></div>
+      <div id="greaterThan"></div>
+      <br />
+      <div id="naturalNumbers"></div>
+      <div id="integers"></div>
+      <div id="realNumbers"></div>
+
+      <div id="isMemberOf"></div>
+      <div id="isProperSubsetOf"></div>
+      <div id="isSubsetOf"></div>
+      <div id="setDifference"></div>
+      <div id="exists"></div>
+      <div id="forAll"></div>
+      <div id="not"></div>
+      <div id="or"></div>
+      <div id="and"></div>
+      <div id="doubleRightArrow"></div>
+      <div id="doubleLeftArrow"></div>
+      <br />
+      <div id="sin"></div>
+      <div id="cos"></div>
+      <div id="tan"></div>
+      <div id="arcsin"></div>
+      <div id="cos-1"></div>
+      <div id="taninv"></div>
+      <br />
+      <div id="integral"></div>
+      <div id="sum"></div>
+      <div id="product"></div>
+      <div id="limit"></div>
+      <div id="leftarrow"></div>
+      <div id="rightarrow"></div>
+      <div id="uparrow"></div>
+      <div id="downarrow"></div>
+      <div id="infty"></div>
+    </div>
+    <p>
+      Note: if you have a physical keyboard attached, you can use that too. For example, try <kbd>^</kbd>, <kbd>*</kbd>, <kbd>(</kbd> and <kbd>/</kbd>.<br />
+      Use Shift + Left for selection mode (or use the blue key).
+    </p>
+    
+    <h2>Parse a LaTeX string</h2>
+    <input id="inputToParse" type="text" placeholder="Type or paste + press Enter" class="disable-physical-keypress-math-input-when-focused" />
+    
+    <div class="footer">
+      <div>View on Github</div>
+      <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine#readme">JavaScript</a>
+      <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine.CSharp#readme">C#</a>
+      <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine.Python#readme">Python</a>
+      <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine.Swift#readme">Swift</a>
+    </div>
+  </body>
+</html>
