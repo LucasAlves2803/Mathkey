@@ -106,9 +106,9 @@
       registerNodeKey('roundBrackets', () => new mke.RoundBracketsNode(), mke.insert, mke.insertWithEncapsulateSelection);
       const getSquareBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left[`, String.raw`\right]`);
       registerNodeKey('squareBrackets', getSquareBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
-      const getPipesNode = () => new mke.StandardBranchingNode(String.raw`\left|`, String.raw`\right|`);
-      registerNodeKey('pipes', getPipesNode, mke.insert, mke.insertWithEncapsulateSelection);
-      registerNodeKey('doublePipes', () => new mke.StandardBranchingNode(String.raw`\left\|`, String.raw`\right\|`), mke.insert, mke.insertWithEncapsulateSelection);
+      // const getPipesNode = () => new mke.StandardBranchingNode(String.raw`\left|`, String.raw`\right|`);
+      // registerNodeKey('pipes', getPipesNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // registerNodeKey('doublePipes', () => new mke.StandardBranchingNode(String.raw`\left\|`, String.raw`\right\|`), mke.insert, mke.insertWithEncapsulateSelection);
       const getCurlyBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left\{`, String.raw`\right\}`);
       registerNodeKey('curlyBrackets', getCurlyBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
       // registerNodeKey('naturalNumbers', () => new mke.StandardLeafNode(String.raw`\mathbb{N}`));
@@ -551,8 +551,6 @@
       <div id="roundBrackets"></div>
       <div id="squareBrackets"></div>
       <div id="curlyBrackets"></div>
-      <div id="pipes"></div>
-      <div id="doublePipes"></div>
       <br />
         <!-- <div style="text-align: right">
           <label for="matrixHeight">Height</label>
