@@ -190,6 +190,8 @@
         }
 
         let latex = mke.getViewModeLatex(nodeGetter(), latexConfiguration);
+        console.log(latex); // Depure para ver o que está sendo inserido
+
         typesetLatexInKey(latex, element);
         element.onclick = () => {
           if (mke.inSelectionMode(keyboardMemory)) {
@@ -243,6 +245,35 @@
       // === MathJax specific code START ===
       function typesetLatexInKey(latex, element) {
         element.innerText = String.raw`\(` + latex + String.raw`\)`;
+        element.style = `color: red; 
+                         width: 10px; 
+                         height: 10px; 
+                         display: flex; 
+                         align-items: center;
+                         justify-content: center;
+                         border: 2px solid red;
+                         border-radius: 5px;
+                         background-color: white;
+                         font-size: 1.2rem;
+                         cursor: pointer;
+        `
+  // const symbols = document.querySelectorAll(`symbol`);
+
+// symbols.forEach(symbol => {
+//   symbol.addEventListener('mouseenter', () => {
+//     symbol.style.backgroundColor = 'red';
+//     symbol.style.color = 'white';
+//     symbol.style.transform = 'scale(4.1)';
+//     symbol.style.transition = 'all 0.2s ease';
+//   });
+
+//   symbol.addEventListener('mouseleave', () => {
+//     symbol.style.backgroundColor = 'white';
+//     symbol.style.color = 'red';
+//     symbol.style.transform = 'scale(1)';
+//   });
+// });
+
         MathJax.Hub.Typeset(element);
       }
 
@@ -498,6 +529,48 @@
         font-size: 1rem;
         padding: 2px;
       }
+
+      /* estilo novo adicionado */
+      .symbols-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    /* .symbol {
+  width: 20px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid red;
+  border-radius: 5px;
+  background-color: white;
+  font-size: 1.2rem;
+  color: red;
+  cursor: pointer;
+} */
+
+
+.symbol:hover {
+    background-color : 'red';
+    color: 'white';
+    transform : scale(1.2);
+    transition : all 0.534s ease;
+    }
+
+  .symbol:active{
+  background-color: red; /* Cor de fundo ao passar o mouse */
+  color: white;          /* Texto branco ao passar o mouse */
+  transform: scale(1.6); /* Pequeno zoom */
+  transition: all 0.2s ease; /* Suaviza a animação */
+}
+
+
+
+
     </style>
   </head>
   <body class="dark">
@@ -560,7 +633,7 @@
     <div id="viewModeLatex"></div>
     <i>Example keys - to be styled - to help you design your virtual math keyboard</i>
     <div id="mathKeyboard">
-      <div id="selectionModeToggle"></div>
+      <div id="selectionModeToggle" class="symbols-container"></div>
       <!-- <div id="digit0"></div>
       <div id="digit1"></div>
       <div id="digit2"></div>
@@ -571,27 +644,27 @@
       <div id="digit7"></div>
       <div id="digit8"></div>
       <div id="digit9"></div> -->
-      <div id="decimalSeparator"></div>
+      <div id="decimalSeparator" class="symbol"></div>
       <!-- <div id="plusminus"></div> -->
-      <div id="plus"></div>
-      <div id="minus"></div>
-      <div id="multiply"></div>
-      <div id="ratio"></div>
-      <div id="div"></div>
-      <div id="binomial"></div>
-      <div id="fraction"></div>
-      <div id="power"></div>
-      <div id="squareRoot"></div>
-      <div id="nthRoot"></div>
-      <div id="roundBrackets"></div>
-      <div id="squareBrackets"></div>
-      <div id="curlyBrackets"></div>
-      <div id="sin"></div>
-      <div id="cos"></div>
-      <div id="tan"></div>
-      <div id="arcsin"></div>
-      <div id="cos-1"></div>
-      <div id="taninv"></div>
+      <div id="plus" class="symbol"></div>
+      <div id="minus" class="symbol"></div>
+      <div id="multiply" class="symbol"></div>
+      <div id="ratio" class="symbol"></div>
+      <div id="div" class="symbol"></div>
+      <div id="binomial" class="symbol"></div>
+      <div id="fraction" class="symbol"></div>
+      <div id="power" class="symbol"></div>
+      <div id="squareRoot" class="symbol"></div>
+      <div id="nthRoot" class="symbol"></div>
+      <div id="roundBrackets" class="symbol"></div>
+      <div id="squareBrackets" class="symbol"></div>
+      <div id="curlyBrackets" class="symbol"></div>
+      <div id="sin" class="symbol"></div>
+      <div id="cos" class="symbol"></div>
+      <div id="tan" class="symbol"></div>
+      <div id="arcsin" class="symbol"></div>
+      <div id="cos-1" class="symbol"></div>
+      <div id="taninv" class="symbol"></div>
       <div onclick="const settingsContainer = document.getElementById('settingsContainer'); settingsContainer.style.display = settingsContainer.style.display == 'block' ? 'none' : 'block';">
         <strong>Settings</strong>
       </div>
