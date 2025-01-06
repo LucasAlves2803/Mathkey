@@ -46,9 +46,9 @@
 
       displayResult();
 
-      for (let i = 0; i < 10; i++) {
-        registerNodeKey('digit' + i, () => new mke.DigitNode(i.toString()));
-      }
+      // for (let i = 0; i < 10; i++) {
+      //   registerNodeKey('digit' + i, () => new mke.DigitNode(i.toString()));
+      // }
 
       // for (let letter of ['a', 'b', 'c', 'x', 'y', 'z']) {
       //   registerNodeKey(letter, () => new mke.StandardLeafNode(letter));
@@ -79,7 +79,7 @@
       // registerNodeKey('greaterThan', () => new mke.StandardLeafNode('>'));
       // registerNodeKey('lessThanOrEqual', () => new mke.StandardLeafNode(String.raw`\leq`));
       // registerNodeKey('greaterThanOrEqual', () => new mke.StandardLeafNode(String.raw`\geq`));
-      registerNodeKey('plusminus', () => new mke.StandardLeafNode(String.raw`\pm`));
+      // registerNodeKey('plusminus', () => new mke.StandardLeafNode(String.raw`\pm`));
       registerNodeKey('plus', () => new mke.StandardLeafNode('+'));
       registerNodeKey('minus', () => new mke.StandardLeafNode('-'));
       registerNodeKey('div', () => new mke.StandardLeafNode('÷'));
@@ -150,15 +150,15 @@
         // matrixWidthInputElement.onchange = reRegisterMatrix;
         // matrixHeightInputElement.onchange = reRegisterMatrix;
 
-      registerKey('moveLeft', mke.moveLeft, mke.selectLeft, false);
-      typesetLatexInKey(String.raw`\leftarrow`, document.getElementById('moveLeft'));
-      registerKey('moveRight', mke.moveRight, mke.selectRight, false);
-      typesetLatexInKey(String.raw`\rightarrow`, document.getElementById('moveRight'));
-      registerKey('moveUp', mke.moveUp);
-      typesetLatexInKey('\\uparrow', document.getElementById('moveUp'));
-      registerKey('moveDown', mke.moveDown);
-      typesetLatexInKey(String.raw`\downarrow`, document.getElementById('moveDown'));
-      registerKey('deleteLeft', mke.deleteLeft, mke.deleteSelection);
+      // registerKey('moveLeft', mke.moveLeft, mke.selectLeft, false);
+      // typesetLatexInKey(String.raw`\leftarrow`, document.getElementById('moveLeft'));
+      // registerKey('moveRight', mke.moveRight, mke.selectRight, false);
+      // typesetLatexInKey(String.raw`\rightarrow`, document.getElementById('moveRight'));
+      // registerKey('moveUp', mke.moveUp);
+      // typesetLatexInKey('\\uparrow', document.getElementById('moveUp'));
+      // registerKey('moveDown', mke.moveDown);
+      // typesetLatexInKey(String.raw`\downarrow`, document.getElementById('moveDown'));
+      // registerKey('deleteLeft', mke.deleteLeft, mke.deleteSelection);
 
       registerKey('selectionModeToggle', (k) => {
         if (mke.inSelectionMode(k)) {
@@ -501,12 +501,7 @@
     </style>
   </head>
   <body class="dark">
-    <h1>MathKeyboardEngine + MathJax</h1>
-    <div id="inputMirror"></div>
-    <div id="typesetEditModeLatex"></div>
-    <div id="viewModeLatex"></div>
-    <i>Example keys - to be styled - to help you design your virtual math keyboard</i>
-    <div id="mathKeyboard">
+    <!-- <div id="mathKeyboard">
       <div id="selectionModeToggle"></div>
       <div id="moveUp">&#x25B2;</div>
       <div id="deleteLeft">&#128293;</div>
@@ -552,22 +547,59 @@
       <div id="squareBrackets"></div>
       <div id="curlyBrackets"></div>
       <br />
-        <!-- <div style="text-align: right">
-          <label for="matrixHeight">Height</label>
-          <input id="matrixHeight" type="number" value="2" min="1" class="disable-physical-keypress-math-input-when-focused" />
-          <br />
-          <label for="matrixWidth">Width</label>
-          <input id="matrixWidth" type="number" value="2" min="1" class="disable-physical-keypress-math-input-when-focused" />
-        </div>
-        <div id="pmatrix"></div>
-        <div id="vmatrix"></div> -->
-      <br />
       <div id="sin"></div>
       <div id="cos"></div>
       <div id="tan"></div>
       <div id="arcsin"></div>
       <div id="cos-1"></div>
       <div id="taninv"></div>
+    </div> -->
+    <h1>MathKeyboardEngine + MathJax</h1>
+    <div id="inputMirror"></div>
+    <div id="typesetEditModeLatex"></div>
+    <div id="viewModeLatex"></div>
+    <i>Example keys - to be styled - to help you design your virtual math keyboard</i>
+    <div id="mathKeyboard">
+      <div id="selectionModeToggle"></div>
+      <!-- <div id="digit0"></div>
+      <div id="digit1"></div>
+      <div id="digit2"></div>
+      <div id="digit3"></div>
+      <div id="digit4"></div>
+      <div id="digit5"></div>
+      <div id="digit6"></div>
+      <div id="digit7"></div>
+      <div id="digit8"></div>
+      <div id="digit9"></div> -->
+      <div id="decimalSeparator"></div>
+      <!-- <div id="plusminus"></div> -->
+      <div id="plus"></div>
+      <div id="minus"></div>
+      <div id="multiply"></div>
+      <div id="ratio"></div>
+      <div id="div"></div>
+      <div id="binomial"></div>
+      <div id="fraction"></div>
+      <div id="power"></div>
+      <div id="squareRoot"></div>
+      <div id="nthRoot"></div>
+      <div id="roundBrackets"></div>
+      <div id="squareBrackets"></div>
+      <div id="curlyBrackets"></div>
+      <div id="sin"></div>
+      <div id="cos"></div>
+      <div id="tan"></div>
+      <div id="arcsin"></div>
+      <div id="cos-1"></div>
+      <div id="taninv"></div>
+      <div onclick="const settingsContainer = document.getElementById('settingsContainer'); settingsContainer.style.display = settingsContainer.style.display == 'block' ? 'none' : 'block';">
+        <strong>Settings</strong>
+      </div>
+      <div id="settingsContainer">
+        <div id="multiplicationSignToggle" class="setting">Output multiplication sign: <span class="setting-value" id="multiplicationSignType">cross</span></div>
+        <div id="decimalSeparatorToggle" class="setting">Decimal separator: <span class="setting-value" id="decimalSeparatorType">decimal point</span></div>
+        <div id="colorSchemeToggle" class="setting">Color scheme: <span class="setting-value" id="colorScheme"></span></div>
+      </div>
     </div>
     <p>
       Note: if you have a physical keyboard attached, you can use that too. For example, try <kbd>^</kbd>, <kbd>*</kbd>, <kbd>(</kbd> and <kbd>/</kbd>.<br />
