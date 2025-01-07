@@ -7,6 +7,7 @@
     <!-- MathJax specific code START -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <!-- MathJax specific code END -->
+    <script src="../latex-to-js.js"></script>
     <script type="module">
       import * as mke from 'https://cdn.jsdelivr.net/npm/mathkeyboardengine@v1.1.0/dist/MathKeyboardEngine.es2017-esm.min.js';
       let latexConfiguration = new mke.LatexConfiguration();
@@ -236,47 +237,33 @@
           latexConfiguration.activePlaceholderShape = '|';
         }
         let editModeLatex = mke.getEditModeLatex(keyboardMemory, latexConfiguration);
-        typesetLatexInOutputBox(editModeLatex, document.getElementById('typesetEditModeLatex'));
-
+        typesetLatexInOutputBox(editModeLatex, document.getElementById('typesetEditModeLatex')); // chama a função que renderiza o latex de forma bonita
+        let expressao = mke.getEditModeLatex(keyboardMemory, latexConfiguration);
+        // console.log(Object.keys(latexConfiguration)); // Lista todos os métodos e propriedades do objeto
+        // console.log(Object.keys(keyboardMemory)); // Lista todos os métodos e propriedades do objeto
         let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
+        console.log(latex_to_js(expressao));
         document.getElementById('viewModeLatex').innerText = viewModeLatex;
       }
 
       // === MathJax specific code START ===
       function typesetLatexInKey(latex, element) {
         element.innerText = String.raw`\(` + latex + String.raw`\)`;
-        element.style = `color: red; 
-                         width: 10px; 
-                         height: 10px; 
-                         display: flex; 
-                         align-items: center;
-                         justify-content: center;
-                         border: 2px solid red;
-                         border-radius: 5px;
-                         background-color: white;
-                         font-size: 1.2rem;
-                         cursor: pointer;
-        `
-  // const symbols = document.querySelectorAll(`symbol`);
-
-// symbols.forEach(symbol => {
-//   symbol.addEventListener('mouseenter', () => {
-//     symbol.style.backgroundColor = 'red';
-//     symbol.style.color = 'white';
-//     symbol.style.transform = 'scale(4.1)';
-//     symbol.style.transition = 'all 0.2s ease';
-//   });
-
-//   symbol.addEventListener('mouseleave', () => {
-//     symbol.style.backgroundColor = 'white';
-//     symbol.style.color = 'red';
-//     symbol.style.transform = 'scale(1)';
-//   });
-// });
-
         MathJax.Hub.Typeset(element);
-      }
-
+        element.classList.add('symbol'); // Adicione a classe .symbol para manter o estilo consistente
+        // element.style = `color: red; 
+        //                  width: 10px; 
+        //                  height: 10px; 
+        //                  display: flex; 
+        //                  align-items: center;
+        //                  justify-content: center;
+        //                  border: 2px solid red;
+        //                  border-radius: 5px;
+        //                  background-color: white;
+        //                  font-size: 1.2rem;
+        //                  cursor: pointer;
+        // `
+    }
       function typesetLatexInOutputBox(latex, element) {
         element.innerText = String.raw`\(\displaystyle ` + latex + String.raw`\)`;
         MathJax.Hub.Typeset(element);
@@ -531,27 +518,38 @@
       }
 
       /* estilo novo adicionado */
-      .symbols-container {
+      /* .symbols-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       margin-top: 10px;
       gap: 10px;
-    }
+    } */
 
-    /* .symbol {
-  width: 20px;
-  height: 40px;
+    .symbol {
+  color: black;
+  width: 40px; /* Aumente a largura para melhor alinhamento */
+  height: 20px; /* Altura consistente */
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid red;
-  border-radius: 5px;
+  border: 5px solid red;
+  border-radius: 5px; 
   background-color: white;
   font-size: 1.2rem;
-  color: red;
   cursor: pointer;
-} */
+}
+
+.symbols-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 10px; /* Espaço entre os elementos */
+}
+
+
+   
 
 
 .symbol:hover {
