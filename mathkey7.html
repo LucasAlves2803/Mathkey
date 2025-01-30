@@ -336,6 +336,7 @@
         createHandler((key) => key == 'Period' || key == 'Comma', (k, key) => mke.insert(k, getDecimalSeparatorNode())),
         createHandler((key) => key == 'BracketLeft', (k, key) => mke.insert(k, getSquareBracketsNode())),
         createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'IntlRo', (k, key) => mke.insert(k, new mke.StandardLeafNode('÷'))),
         createHandler((key) => key == 'Delete', (k, key) => mke.deleteRight(k)),
       ];
 
@@ -345,6 +346,7 @@
         }
         const shouldPreventDefault = true;
         const key = e.code;
+        console.log(key);
         if (key.startsWith('Shift')) {
           inShift = true;
         } else if (mke.inSelectionMode(keyboardMemory)) {
@@ -378,6 +380,8 @@
           } else if (inShift) {
             physicalKeydownHandlersForShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
           } else {
+            // console.log("Aqui aparecerá apenas os dígitos " + key);
+            // console.log(key === 'IntlRo');
             physicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
           }
         }
