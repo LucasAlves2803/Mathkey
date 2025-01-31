@@ -242,8 +242,10 @@
         // console.log(Object.keys(latexConfiguration)); // Lista todos os métodos e propriedades do objeto
         // console.log(Object.keys(keyboardMemory)); // Lista todos os métodos e propriedades do objeto
         let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
-        console.log(latex_to_js(expressao));
+        // console.log(latex_to_js(expressao));
         document.getElementById('viewModeLatex').innerText = viewModeLatex;
+        console.log("elementos digitados: "+ viewModeLatex);
+        console.log("Expressão digitada " + latex_to_js(expressao));
       }
 
       // === MathJax specific code START ===
@@ -336,9 +338,17 @@
         createHandler((key) => key == 'Period' || key == 'Comma', (k, key) => mke.insert(k, getDecimalSeparatorNode())),
         createHandler((key) => key == 'BracketLeft', (k, key) => mke.insert(k, getSquareBracketsNode())),
         createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
-        createHandler((key) => key == 'IntlRo', (k, key) => mke.insert(k, new mke.StandardLeafNode('÷'))),
+        createHandler((key) => key == 'IntlRo', (k, key) => mke.insert(k, new mke.StandardLeafNode('÷'))), // comando para fazer o simbolo da divisão funcionar usando as teclas do teclado
+        createHandler((key) => key == 'Enter', (k, key) => new_display()),
         createHandler((key) => key == 'Delete', (k, key) => mke.deleteRight(k)),
       ];
+
+
+      function new_display(){
+        let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
+        const expressao = document.querySelector('.expressao');
+        expressao.innerHTML = viewModeLatex;
+      }
 
       document.onkeydown = (e) => {
         if (document.activeElement.classList.contains('disable-physical-keypress-math-input-when-focused')) {
@@ -380,7 +390,7 @@
           } else if (inShift) {
             physicalKeydownHandlersForShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
           } else {
-            // console.log("Aqui aparecerá apenas os dígitos " + key);
+            console.log("Aqui aparecerá apenas os dígitos " + key);
             // console.log(key === 'IntlRo');
             physicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
           }
@@ -530,6 +540,14 @@
       gap: 10px;
     } */
 
+    .expressao{
+      border: 1px solid white;
+      font-size: 34px;
+      width: 20px;
+      height: 34px;
+      color: white;
+    }
+
     .symbol {
   color: black;
   width: 40px; /* Aumente a largura para melhor alinhamento */
@@ -675,8 +693,10 @@
         <div id="decimalSeparatorToggle" class="setting">Decimal separator: <span class="setting-value" id="decimalSeparatorType">decimal point</span></div>
         <div id="colorSchemeToggle" class="setting">Color scheme: <span class="setting-value" id="colorScheme"></span></div>
       </div>
+      
     </div>
-    <p>
+    <div class="expressao"></div>
+    <!-- <p>
       Note: if you have a physical keyboard attached, you can use that too. For example, try <kbd>^</kbd>, <kbd>*</kbd>, <kbd>(</kbd> and <kbd>/</kbd>.<br />
       Use Shift + Left for selection mode (or use the blue key).
     </p>
@@ -690,6 +710,6 @@
       <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine.CSharp#readme">C#</a>
       <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine.Python#readme">Python</a>
       <a href="https://github.com/MathKeyboardEngine/MathKeyboardEngine.Swift#readme">Swift</a>
-    </div>
+    </div> -->
   </body>
 </html>
